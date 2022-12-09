@@ -41,8 +41,18 @@ import numpy as np
 #     cv2.imshow('img', resize_img)
 #     cv2.imshow('hsv_img', resize_mask)
 
+#DO POPRAWKI
+#05 czerwony
+#06 dosyc male pole
+#07 czerwony ale nie tak zle
+#11 fioletowy not bad, 12 to samo
+#21, 23, 24, 25 i kolejne fioletowy
+#30 fioletowy
+#31 fioletowy
+# TROCHE CIEMNIEJSZY FIOLETOWY I CZEWRWONY, ZOBACZYC JAK Z ZMNIEJSZANIE I POTEM SPRAWDZANIE POLA
+
 # APPLY MASK
-img_path = "D:\\Studia\\Semestr 5\\WDPO Lab\\projekt\\WDPO\\data\\00.jpg"
+img_path = "D:\\Studia\\Semestr 5\\WDPO Lab\\projekt\\WDPO\\data\\39.jpg"
 img = cv2.imread(img_path, cv2.IMREAD_COLOR)
 hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
