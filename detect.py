@@ -21,13 +21,20 @@ def detect(img_path: str) -> Dict[str, int]:
     """
 
     #TODO: Implement detection method.
-    img = cv2.imread(img_path, cv2.IMREAD_COLOR)
-    hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    
     red = 0
     yellow = 0
     green = 0
     purple = 0
+
+    img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+    hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV).astype('float32')
+
+    resize_img = cv2.resize(img, (500, 500))
+
+    red_lower = np.array([11, 104, 255])
+    red_upper = np.array([3, 255, 255])
+    red_lower2 = np.array([0, 42, 0])
+    red_upper2 = np.array([7, 255, 255])
 
     return {'red': red, 'yellow': yellow, 'green': green, 'purple': purple}
 
