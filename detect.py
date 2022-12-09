@@ -1,11 +1,10 @@
 import json
 from pathlib import Path
 from typing import Dict
-
 import click
 import cv2
 from tqdm import tqdm
-
+import numpy as np
 
 def detect(img_path: str) -> Dict[str, int]:
     """Object detection function, according to the project description, to implement.
@@ -20,9 +19,10 @@ def detect(img_path: str) -> Dict[str, int]:
     Dict[str, int]
         Dictionary with quantity of each object.
     """
-    img = cv2.imread(img_path, cv2.IMREAD_COLOR)
 
     #TODO: Implement detection method.
+    img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+    hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     
     red = 0
     yellow = 0
