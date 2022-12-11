@@ -64,12 +64,23 @@ mask_hsv_red = cv2.inRange(hsv, (170, 43, 125), (255, 255, 255))
 
 #mask_hsv = cv2.inRange(hsv, (Hmin, Smin, Vmin), (Hmax, Smax, Vmax))
 kernel = np.ones((7, 7), np.uint8)
-kernel1 = np.ones((5, 5), np.uint8)
+kernel1 = np.ones((1, 1), np.uint8)
 #erosion = cv2.erode(mask_hsv_purple, kernel, iterations=1)
 opening = cv2.morphologyEx(mask_hsv_green, cv2.MORPH_OPEN, kernel)
 closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel1)
 dilation = cv2.dilate(closing, kernel, iterations=1)
-resize_erosion = cv2.resize(closing, (500, 500))
+resize_closing = cv2.resize(closing, (500, 500))
+resize_opening = cv2.resize(opening, (500, 500))
+
+#
+white = np.argwhere(opening == 255)
+# array = white[0]
+print(white)
+print(white[10, 0])
+print(white[10, 1])
+items = []
+for i in white:
+    print(i[0])
 
 resize_img = cv2.resize(img, (500, 500))
 resize_mask_green = cv2.resize(mask_hsv_green, (500, 500))
@@ -77,12 +88,13 @@ resize_mask_purple = cv2.resize(mask_hsv_purple, (500, 500))
 resize_mask_yellow = cv2.resize(mask_hsv_yellow, (500, 500))
 resize_mask_red = cv2.resize(mask_hsv_red, (500, 500))
 
-cv2.imshow('img', resize_img)
-cv2.imshow('green', resize_mask_green)
-# cv2.imshow('purple', resize_mask_purple)
-# cv2.imshow('yellow', resize_mask_yellow)
-# cv2.imshow('red', resize_mask_red)
-
-cv2.imshow('erosion', resize_erosion)
-cv2.waitKey()
+# cv2.imshow('img', resize_img)
+# cv2.imshow('green', resize_mask_green)
+# # cv2.imshow('purple', resize_mask_purple)
+# # cv2.imshow('yellow', resize_mask_yellow)
+# # cv2.imshow('red', resize_mask_red)
+#
+# cv2.imshow('closing', resize_closing)
+# cv2.imshow('opening', resize_opening)
+# cv2.waitKey()
 
