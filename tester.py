@@ -6,6 +6,7 @@ import cv2
 from tqdm import tqdm
 import numpy as np
 
+
 def detect(img_path: str) -> Dict[str, int]:
     """Object detection function, according to the project description, to implement.
 
@@ -20,7 +21,7 @@ def detect(img_path: str) -> Dict[str, int]:
         Dictionary with quantity of each object.
     """
 
-    #TODO: Implement detection method.
+    # TODO: Implement detection method.
     red = 0
     yellow = 0
     green = 0
@@ -30,7 +31,7 @@ def detect(img_path: str) -> Dict[str, int]:
     blur_bilateral = cv2.bilateralFilter(img, 15, 75, 75)
     hsv = cv2.cvtColor(blur_bilateral, cv2.COLOR_BGR2HSV)
 
-#green
+    # green
     mask_hsv_green = cv2.inRange(hsv, (33, 190, 0), (146, 255, 255))
     kernel = np.ones((7, 7), np.uint8)
     kernel1 = np.ones((11, 11), np.uint8)
@@ -41,7 +42,7 @@ def detect(img_path: str) -> Dict[str, int]:
     dilation = cv2.dilate(erosion, kernel2, iterations=1)
     cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     green = len(cnt)
-#purple
+    # purple
     mask_hsv_purple = cv2.inRange(hsv, (138, 84, 0), (170, 255, 255))
     kernel = np.ones((14, 14), np.uint8)
     kernel1 = np.ones((11, 11), np.uint8)
@@ -52,7 +53,7 @@ def detect(img_path: str) -> Dict[str, int]:
     dilation = cv2.dilate(erosion, kernel, iterations=1)
     cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     purple = len(cnt)
-#yellow
+    # yellow
     mask_hsv_yellow = cv2.inRange(hsv, (6, 203, 83), (30, 255, 255))
     kernel = np.ones((7, 7), np.uint8)
     kernel1 = np.ones((9, 9), np.uint8)
@@ -63,7 +64,7 @@ def detect(img_path: str) -> Dict[str, int]:
     dilation = cv2.dilate(erosion, kernel2, iterations=1)
     cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     yellow = len(cnt)
-#red
+    # red
     mask_hsv_red = cv2.inRange(hsv, (170, 43, 125), (255, 255, 255))
     kernel = np.ones((10, 10), np.uint8)
     kernel1 = np.ones((9, 9), np.uint8)
@@ -75,13 +76,14 @@ def detect(img_path: str) -> Dict[str, int]:
     cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     red = len(cnt)
 
-
     return {'red': red, 'yellow': yellow, 'green': green, 'purple': purple}
 
 
 @click.command()
-@click.option('-p', '--data_path', help='Path to data directory', type=click.Path(exists=True, file_okay=False, path_type=Path), required=True)
-@click.option('-o', '--output_file_path', help='Path to output file', type=click.Path(dir_okay=False, path_type=Path), required=True)
+@click.option('-p', '--data_path', help='Path to data directory',
+              type=click.Path(exists=True, file_okay=False, path_type=Path), required=True)
+@click.option('-o', '--output_file_path', help='Path to output file', type=click.Path(dir_okay=False, path_type=Path),
+              required=True)
 def main(data_path: Path, output_file_path: Path):
     img_list = data_path.glob('*.jpg')
 
@@ -94,7 +96,31 @@ def main(data_path: Path, output_file_path: Path):
     with open(output_file_path, 'w') as ofp:
         json.dump(results, ofp)
 
+    with open('results.json', 'r') as f:
+        results = json.load(f)
 
+    with open('expected_results.json', 'r') as f:
+        expected = json.load(f)
+
+    notwork = []
+
+    for image in results:
+        if results[image]['red'] != expected[image]['red']:
+            print(image, "red")
+            notwork.append(image)
+        if results[image]['green'] != expected[image]['green']:
+            print(image, "green")
+            notwork.append(image)
+        if results[image]['purple'] != expected[image]['purple']:
+            print(image, "purple")
+            notwork.append(image)
+        if results[image]['yellow'] != expected[image]['yellow']:
+            print(image, "yellow")
+            notwork.append(image)
+    notwork1 = []
+    [notwork1.append(x) for x in notwork if x not in notwork1]
+    print(notwork1)
+    print(len(notwork1))
 
 
 if __name__ == '__main__':
