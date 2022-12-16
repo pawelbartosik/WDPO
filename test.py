@@ -52,7 +52,7 @@ import numpy as np
 # TROCHE CIEMNIEJSZY FIOLETOWY I CZEWRWONY, ZOBACZYC JAK Z ZMNIEJSZANIE I POTEM SPRAWDZANIE POLA
 
 # APPLY MASK
-img_path = "D:\\Studia\\Semestr 5\\WDPO Lab\\projekt\\WDPO\\data\\00.jpg"
+img_path = "D:\\Studia\\Semestr 5\\WDPO Lab\\projekt\\WDPO\\data\\39.jpg"
 img = cv2.imread(img_path, cv2.IMREAD_COLOR)
 blur_bilateral = cv2.bilateralFilter(img, 15, 75, 75)
 hsv = cv2.cvtColor(blur_bilateral, cv2.COLOR_BGR2HSV)
@@ -65,17 +65,20 @@ mask_hsv_yellow = cv2.inRange(hsv, (6, 203, 83), (30, 255, 255))
 mask_hsv_red = cv2.inRange(hsv, (170, 43, 125), (255, 255, 255))
 
 #mask_hsv = cv2.inRange(hsv, (Hmin, Smin, Vmin), (Hmax, Smax, Vmax))
-kernel = np.ones((7, 7), np.uint8)
-kernel1 = np.ones((1, 1), np.uint8)
+kernel = np.ones((10, 10), np.uint8)
+kernel1 = np.ones((9, 9), np.uint8) #11, 11 green,
+kernel2 = np.ones((11, 11), np.uint8)#5, 5 green,
 #erosion = cv2.erode(mask_hsv_purple, kernel, iterations=1)
-opening = cv2.morphologyEx(mask_hsv_purple, cv2.MORPH_OPEN, kernel)
+opening = cv2.morphologyEx(mask_hsv_green, cv2.MORPH_OPEN, kernel)
 closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel1)
-dilation = cv2.dilate(closing, kernel, iterations=1)
+erosion = cv2.erode(closing, kernel1, iterations=1)
+dilation = cv2.dilate(erosion, kernel2, iterations=1)
 resize_closing = cv2.resize(closing, (500, 500))
 resize_opening = cv2.resize(opening, (500, 500))
+dilation_res = cv2.resize(dilation, (500, 500))
 
 #
-white = np.argwhere(opening == 255)
+white = np.argwhere(dilation == 255)
 # array = white[0]
 # print(white)
 # print(white[10, 0])
@@ -84,7 +87,7 @@ white = np.argwhere(opening == 255)
 # for i in white:
 #     print(i[0])
 
-cnt, _ = cv2.findContours(opening, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 print(len(cnt))
 
 resize_img = cv2.resize(img, (500, 500))
@@ -94,13 +97,14 @@ resize_mask_yellow = cv2.resize(mask_hsv_yellow, (500, 500))
 resize_mask_red = cv2.resize(mask_hsv_red, (500, 500))
 
 cv2.imshow('img', resize_img)
-# cv2.imshow('green', resize_mask_green)
-cv2.imshow('purple', resize_mask_purple)
-# # cv2.imshow('yellow', resize_mask_yellow)
-# # cv2.imshow('red', resize_mask_red)
+cv2.imshow('green', resize_mask_green)
+# cv2.imshow('purple', resize_mask_purple)
+# cv2.imshow('yellow', resize_mask_yellow)
+# cv2.imshow('red', resize_mask_red)
 #
 # cv2.imshow('closing', resize_closing)
 cv2.imshow('opening', resize_opening)
+cv2.imshow('dilation', dilation_res)
 cv2.waitKey()
 
 

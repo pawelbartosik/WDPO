@@ -27,14 +27,54 @@ def detect(img_path: str) -> Dict[str, int]:
     purple = 0
 
     img = cv2.imread(img_path, cv2.IMREAD_COLOR)
-    hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV).astype('float32')
+    blur_bilateral = cv2.bilateralFilter(img, 15, 75, 75)
+    hsv = cv2.cvtColor(blur_bilateral, cv2.COLOR_BGR2HSV)
 
-    resize_img = cv2.resize(img, (500, 500))
+#green
+    mask_hsv_green = cv2.inRange(hsv, (33, 190, 0), (146, 255, 255))
+    kernel = np.ones((7, 7), np.uint8)
+    kernel1 = np.ones((11, 11), np.uint8)
+    kernel2 = np.ones((5, 5), np.uint8)
+    opening = cv2.morphologyEx(mask_hsv_green, cv2.MORPH_OPEN, kernel)
+    closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel1)
+    erosion = cv2.erode(closing, kernel1, iterations=1)
+    dilation = cv2.dilate(erosion, kernel2, iterations=1)
+    cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    green = len(cnt)
+#purple
+    mask_hsv_purple = cv2.inRange(hsv, (138, 84, 0), (170, 255, 255))
+    kernel = np.ones((14, 14), np.uint8)
+    kernel1 = np.ones((11, 11), np.uint8)
+    kernel2 = np.ones((5, 5), np.uint8)
+    opening = cv2.morphologyEx(mask_hsv_purple, cv2.MORPH_OPEN, kernel)
+    closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel1)
+    erosion = cv2.erode(closing, kernel2, iterations=1)
+    dilation = cv2.dilate(erosion, kernel, iterations=1)
+    cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    purple = len(cnt)
+#yellow
+    mask_hsv_yellow = cv2.inRange(hsv, (6, 203, 83), (30, 255, 255))
+    kernel = np.ones((7, 7), np.uint8)
+    kernel1 = np.ones((9, 9), np.uint8)
+    kernel2 = np.ones((11, 11), np.uint8)
+    opening = cv2.morphologyEx(mask_hsv_yellow, cv2.MORPH_OPEN, kernel)
+    closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel1)
+    erosion = cv2.erode(closing, kernel1, iterations=1)
+    dilation = cv2.dilate(erosion, kernel2, iterations=1)
+    cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    yellow = len(cnt)
+#red
+    mask_hsv_red = cv2.inRange(hsv, (170, 43, 125), (255, 255, 255))
+    kernel = np.ones((10, 10), np.uint8)
+    kernel1 = np.ones((9, 9), np.uint8)
+    kernel2 = np.ones((11, 11), np.uint8)
+    opening = cv2.morphologyEx(mask_hsv_red, cv2.MORPH_OPEN, kernel)
+    closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel1)
+    erosion = cv2.erode(closing, kernel1, iterations=1)
+    dilation = cv2.dilate(erosion, kernel2, iterations=1)
+    cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    red = len(cnt)
 
-    red_lower = np.array([11, 104, 255])
-    red_upper = np.array([3, 255, 255])
-    red_lower2 = np.array([0, 42, 0])
-    red_upper2 = np.array([7, 255, 255])
 
     return {'red': red, 'yellow': yellow, 'green': green, 'purple': purple}
 
