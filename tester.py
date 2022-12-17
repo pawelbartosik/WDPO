@@ -29,21 +29,21 @@ def detect(img_path: str) -> Dict[str, int]:
 
     img = cv2.imread(img_path, cv2.IMREAD_COLOR)
     blur_bilateral = cv2.bilateralFilter(img, 15, 75, 75)
-    hsv = cv2.cvtColor(blur_bilateral, cv2.COLOR_BGR2HSV)
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     # green
-    mask_hsv_green = cv2.inRange(hsv, (33, 190, 0), (55, 255, 255))
+    mask_hsv_green = cv2.inRange(hsv, (33, 190, 16), (55, 255, 255))
     kernel = np.ones((7, 7), np.uint8)
     kernel1 = np.ones((11, 11), np.uint8)
-    kernel2 = np.ones((5, 5), np.uint8)
+    kernel2 = np.ones((2, 2), np.uint8)
     opening = cv2.morphologyEx(mask_hsv_green, cv2.MORPH_OPEN, kernel)
-    closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel1)
+    closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel2)
     erosion = cv2.erode(closing, kernel1, iterations=1)
-    dilation = cv2.dilate(erosion, kernel2, iterations=1)
+    dilation = cv2.dilate(closing, kernel2, iterations=1)
     cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for c in cnt:
         size = cv2.contourArea(c)
-        if size > 3000:
+        if size > 400:
             green = green + 1
     # purple
     mask_hsv_purple = cv2.inRange(hsv, (145, 24, 10), (177, 255, 122))
@@ -57,7 +57,7 @@ def detect(img_path: str) -> Dict[str, int]:
     cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for c in cnt:
         size = cv2.contourArea(c)
-        if size > 3000:
+        if size > 500:
             purple = purple + 1
     # yellow
     mask_hsv_yellow = cv2.inRange(hsv, (6, 203, 83), (30, 255, 255))
@@ -71,7 +71,7 @@ def detect(img_path: str) -> Dict[str, int]:
     cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for c in cnt:
         size = cv2.contourArea(c)
-        if size > 3000:
+        if size > 500:
             yellow = yellow + 1
     # red
     mask_hsv_red = cv2.inRange(hsv, (170, 43, 125), (255, 255, 255))
@@ -85,7 +85,7 @@ def detect(img_path: str) -> Dict[str, int]:
     cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for c in cnt:
         size = cv2.contourArea(c)
-        if size > 3000:
+        if size > 500:
             red = red + 1
 
     return {'red': red, 'yellow': yellow, 'green': green, 'purple': purple}
@@ -119,32 +119,48 @@ def main(data_path: Path, output_file_path: Path):
     notwork_purple = []
     notwork_yellow = []
     notwork_red = []
+    wrong_green = 0
+    wrong_purple = 0
+    wrong_red = 0
+    wrong_yellow = 0
+    percent = 0
 
     for image in results:
         if results[image]['red'] != expected[image]['red']:
             print(image, "red")
             notwork_red.append(image)
             notwork.append(image)
+            wrong_red = wrong_red + abs(expected[image]['red'] - results[image]['red'])
         if results[image]['green'] != expected[image]['green']:
             print(image, "green")
             notwork_green.append(image)
             notwork.append(image)
+            wrong_green = wrong_green + abs(expected[image]['green'] - results[image]['green'])
         if results[image]['purple'] != expected[image]['purple']:
             print(image, "purple")
             notwork_purple.append(image)
             notwork.append(image)
+            wrong_purple = wrong_purple + abs(expected[image]['purple'] - results[image]['purple'])
         if results[image]['yellow'] != expected[image]['yellow']:
             print(image, "yellow")
             notwork_yellow.append(image)
             notwork.append(image)
+            wrong_yellow = wrong_yellow + abs(expected[image]['yellow'] - results[image]['yellow'])
+
+        percent = percent + ((wrong_red+wrong_yellow+wrong_green+wrong_purple)/(expected[image]['red']+expected[image]['yellow']+expected[image]['green']+expected[image]['purple']))
+
+    # print('before: ', percent)
+    # t_percent = 2.5 * percent
+    # print('after: ', t_percent)
     notwork1 = []
     [notwork1.append(x) for x in notwork if x not in notwork1]
     print(notwork1)
-    print('Total:', len(notwork1))
-    print('Green:', len(notwork_green))
-    print('purple:', len(notwork_purple))
-    print('red:', len(notwork_red))
-    print('yellow:', len(notwork_yellow))
+    total_sum = sum([wrong_green, wrong_yellow, wrong_purple, wrong_red])
+    print('Total:', len(notwork1), 'amount: ', total_sum)
+    print('Green:', len(notwork_green), 'amount: ', wrong_green)
+    print('purple:', len(notwork_purple), 'amount: ', wrong_purple)
+    print('red:', len(notwork_red), 'amount: ', wrong_red)
+    print('yellow:', len(notwork_yellow), 'amount: ', wrong_yellow)
 
 if __name__ == '__main__':
     main()
