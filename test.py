@@ -52,7 +52,7 @@ import numpy as np
 # TROCHE CIEMNIEJSZY FIOLETOWY I CZEWRWONY, ZOBACZYC JAK Z ZMNIEJSZANIE I POTEM SPRAWDZANIE POLA
 
 # APPLY MASK
-img_path = "D:\\Studia\\Semestr 5\\WDPO Lab\\projekt\\WDPO\\data\\09.jpg"
+img_path = "D:\\Studia\\Semestr 5\\WDPO Lab\\projekt\\WDPO\\data\\22.jpg"
 img = cv2.imread(img_path, cv2.IMREAD_COLOR)
 blur_bilateral = cv2.bilateralFilter(img, 15, 75, 75)
 hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -66,13 +66,13 @@ mask_hsv_red = cv2.inRange(hsv, (170, 43, 125), (255, 255, 255))
 
 #mask_hsv = cv2.inRange(hsv, (Hmin, Smin, Vmin), (Hmax, Smax, Vmax))
 kernel = np.ones((7, 7), np.uint8)
-kernel1 = np.ones((11, 11), np.uint8) #11, 11 green,
-kernel2 = np.ones((2, 2), np.uint8)#5, 5 green,
-#erosion = cv2.erode(mask_hsv_purple, kernel, iterations=1)
+kernel1 = np.ones((11, 11), np.uint8)
+kernel2 = np.ones((2, 2), np.uint8)
+
 opening = cv2.morphologyEx(mask_hsv_green, cv2.MORPH_OPEN, kernel)
 closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel2)
 erosion = cv2.erode(closing, kernel1, iterations=1)
-dilation = cv2.dilate(opening, kernel2, iterations=1)
+dilation = cv2.dilate(closing, kernel2, iterations=1)
 resize_closing = cv2.resize(closing, (500, 500))
 resize_opening = cv2.resize(opening, (500, 500))
 dilation_res = cv2.resize(dilation, (500, 500))
@@ -90,12 +90,22 @@ white = np.argwhere(dilation == 255)
 cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 # cv2.contourArea(cnt[0])
 amount = 0
+size = []
+big = False
 for c in cnt:
-    # print(c)
-    size = cv2.contourArea(c)
-    print(size)
-    if size > 500:
-        amount = amount + 1
+    size.append(cv2.contourArea(c))
+for s in size:
+    if s > 8000:
+        big = True
+
+for s1 in size:
+    if big:
+        if s1 > 5000:
+            amount += 1
+    else:
+        if s1 > 400:
+            amount += 1
+print(size)
 print(amount)
 
 resize_img = cv2.resize(img, (500, 500))

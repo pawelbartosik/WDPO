@@ -41,10 +41,21 @@ def detect(img_path: str) -> Dict[str, int]:
     erosion = cv2.erode(closing, kernel1, iterations=1)
     dilation = cv2.dilate(closing, kernel2, iterations=1)
     cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    size = []
+    big = False
     for c in cnt:
-        size = cv2.contourArea(c)
-        if size > 400:
-            green = green + 1
+        size.append(cv2.contourArea(c))
+    for s in size:
+        if s > 8000:
+            big = True
+
+    for s1 in size:
+        if big:
+            if s1 > 4000:
+                green += 1
+        else:
+            if s1 > 400:
+                green += 1
     # purple
     mask_hsv_purple = cv2.inRange(hsv, (145, 24, 10), (177, 255, 122))
     kernel = np.ones((5, 5), np.uint8)
@@ -53,12 +64,23 @@ def detect(img_path: str) -> Dict[str, int]:
     opening = cv2.morphologyEx(mask_hsv_purple, cv2.MORPH_OPEN, kernel)
     closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel1)
     erosion = cv2.erode(closing, kernel2, iterations=1)
-    dilation = cv2.dilate(erosion, kernel, iterations=1)
+    dilation = cv2.dilate(opening, kernel, iterations=1)
     cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    size = []
+    big = False
     for c in cnt:
-        size = cv2.contourArea(c)
-        if size > 500:
-            purple = purple + 1
+        size.append(cv2.contourArea(c))
+    for s in size:
+        if s > 3000:
+            big = True
+
+    for s1 in size:
+        if big:
+            if s1 > 1200:
+                purple += 1
+        else:
+            if s1 > 600:
+                purple += 1
     # yellow
     mask_hsv_yellow = cv2.inRange(hsv, (6, 203, 83), (30, 255, 255))
     kernel = np.ones((7, 7), np.uint8)
@@ -69,10 +91,21 @@ def detect(img_path: str) -> Dict[str, int]:
     erosion = cv2.erode(closing, kernel1, iterations=1)
     dilation = cv2.dilate(erosion, kernel2, iterations=1)
     cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    size = []
+    big = False
     for c in cnt:
-        size = cv2.contourArea(c)
-        if size > 500:
-            yellow = yellow + 1
+        size.append(cv2.contourArea(c))
+    for s in size:
+        if s > 3000:
+            big = True
+
+    for s1 in size:
+        if big:
+            if s1 > 1200:
+                yellow += 1
+        else:
+            if s1 > 400:
+                yellow += 1
     # red
     mask_hsv_red = cv2.inRange(hsv, (170, 43, 125), (255, 255, 255))
     kernel = np.ones((10, 10), np.uint8)
