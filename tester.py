@@ -163,28 +163,28 @@ def main(data_path: Path, output_file_path: Path):
             print(image, "red")
             notwork_red.append(image)
             notwork.append(image)
-            wrong_red = wrong_red + abs(expected[image]['red'] - results[image]['red'])
+            wrong_red = abs(expected[image]['red'] - results[image]['red'])
         if results[image]['green'] != expected[image]['green']:
             print(image, "green")
             notwork_green.append(image)
             notwork.append(image)
-            wrong_green = wrong_green + abs(expected[image]['green'] - results[image]['green'])
+            wrong_green = abs(expected[image]['green'] - results[image]['green'])
         if results[image]['purple'] != expected[image]['purple']:
             print(image, "purple")
             notwork_purple.append(image)
             notwork.append(image)
-            wrong_purple = wrong_purple + abs(expected[image]['purple'] - results[image]['purple'])
+            wrong_purple = abs(expected[image]['purple'] - results[image]['purple'])
         if results[image]['yellow'] != expected[image]['yellow']:
             print(image, "yellow")
             notwork_yellow.append(image)
             notwork.append(image)
-            wrong_yellow = wrong_yellow + abs(expected[image]['yellow'] - results[image]['yellow'])
+            wrong_yellow = abs(expected[image]['yellow'] - results[image]['yellow'])
 
         percent = percent + ((wrong_red+wrong_yellow+wrong_green+wrong_purple)/(expected[image]['red']+expected[image]['yellow']+expected[image]['green']+expected[image]['purple']))
 
-    # print('before: ', percent)
-    # t_percent = 2.5 * percent
-    # print('after: ', t_percent)
+    print('before: ', percent)
+    t_percent = 2.5 * percent
+    print('after: ', t_percent)
     notwork1 = []
     [notwork1.append(x) for x in notwork if x not in notwork1]
     print(notwork1)
