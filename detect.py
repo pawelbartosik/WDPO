@@ -30,7 +30,7 @@ def detect(img_path: str) -> Dict[str, int]:
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
 #green
-    mask_hsv_green = cv2.inRange(hsv, (33, 190, 16), (55, 255, 255))
+    mask_hsv_green = cv2.inRange(hsv, (30, 190, 16), (55, 255, 255))
     kernel = np.ones((7, 7), np.uint8)
     kernel1 = np.ones((11, 11), np.uint8)
     kernel2 = np.ones((2, 2), np.uint8)
@@ -113,10 +113,10 @@ def detect(img_path: str) -> Dict[str, int]:
     closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel1)
     erosion = cv2.erode(closing, kernel1, iterations=1)
     dilation = cv2.dilate(erosion, kernel2, iterations=1)
-    cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnt, _ = cv2.findContours(erosion, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for c in cnt:
         size = cv2.contourArea(c)
-        if size > 500:
+        if size > 400:
             red = red + 1
 
     return {'red': red, 'yellow': yellow, 'green': green, 'purple': purple}
