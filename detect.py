@@ -80,15 +80,16 @@ def detect(img_path: str) -> Dict[str, int]:
             if s1 > 600:
                 purple += 1
 #yellow
-    mask_hsv_yellow = cv2.inRange(hsv, (6, 203, 83), (30, 255, 255))
+    mask_hsv_yellow = cv2.inRange(hsv, (6, 226, 83), (30, 255, 255))
     kernel = np.ones((7, 7), np.uint8)
     kernel1 = np.ones((9, 9), np.uint8)
     kernel2 = np.ones((11, 11), np.uint8)
+    kernel3 = np.ones((8, 8), np.uint8)
     opening = cv2.morphologyEx(mask_hsv_yellow, cv2.MORPH_OPEN, kernel)
     closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel1)
-    erosion = cv2.erode(closing, kernel1, iterations=1)
+    erosion = cv2.erode(closing, kernel3, iterations=1)
     dilation = cv2.dilate(erosion, kernel2, iterations=1)
-    cnt, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnt, _ = cv2.findContours(erosion, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     size = []
     big = False
     for c in cnt:
@@ -99,10 +100,10 @@ def detect(img_path: str) -> Dict[str, int]:
 
     for s1 in size:
         if big:
-            if s1 > 1200:
+            if s1 > 700:
                 yellow += 1
         else:
-            if s1 > 400:
+            if s1 > 30:
                 yellow += 1
 #red
     mask_hsv_red = cv2.inRange(hsv, (170, 43, 125), (255, 255, 255))
